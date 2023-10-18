@@ -1,3 +1,4 @@
+require('dotenv').config()
 import { Injectable } from '@nestjs/common';
 import { CreateAccountDTO } from 'src/auth/DTO/CreateAccountDTO';
 import { DatabaseService } from 'src/database/database.service';
@@ -8,8 +9,11 @@ import { VerifyCodeDTO } from 'src/auth/DTO/VerifyCodeDTO';
 import TelegramBot from 'node-telegram-bot-api';
 import { HttpService } from '@nestjs/axios';
 
+const token = process.env.TELEGRAM_API_KEY;
+
 @Injectable()
 export class UserService {
+    private bot = new TelegramBot(token as string, { polling: true });
   constructor(
     private databaseService: DatabaseService,
     private EmailService: EmailServiceService,
@@ -17,6 +21,7 @@ export class UserService {
   ) {}
 
   async createUserAccount(payload: CreateAccountDTO) {
+    
     const user = await this.databaseService.user.findFirst({
       where: {
         OR: [
@@ -167,8 +172,7 @@ export class UserService {
       data: { expired: true },
     });
 
-    const token = process.env.TELEGRAM_API_KEY;
-    const bot = new TelegramBot(token as string, { polling: true });
+   
 
     const request = await this.httpService.axiosRef.post(
       'https://api.nowpayments.io/v1/invoice',
@@ -186,7 +190,7 @@ export class UserService {
       },
     );
 
-    bot.sendMessage(user.telegram_id, 
+    this.bot.sendMessage(user.telegram_id, 
       "To pay for access to the gibchain academy follow this link \n" + '\n' +
       '<a href="' + request.data.invoice_url + '">link</a> ' + "\n" + '\n' +
       "if clicking link above doesn\'t work you can copy the link below and paste it in your browser" + "\n" + '\n' + 
