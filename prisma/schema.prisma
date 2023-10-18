@@ -1,0 +1,45 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+    directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model User {
+    id                String      @id @default(cuid())
+    name              String?
+    telegram_username String
+    telegram_id       String
+    email             String      @unique
+    email_verified      Boolean @default(false)
+    phone             String
+    referral          String?
+    has_paid          Boolean     @default(false)
+    createdAt         DateTime    @default(now()) @map(name: "created_at")
+    updatedAt         DateTime    @updatedAt @map(name: "updated_at")
+    referrals         Referrals[]
+}
+
+model Referrals {
+    id      String  @id @default(cuid())
+    User    User?   @relation(fields: [telegram_id], references: [id])
+    telegram_id  String?
+}
+
+enum OTP_TYPE {
+    VERIFICATION
+    WITHDRAWAL
+}
+
+model Code {
+    id String @id @default(cuid())
+    user_id String
+    code Int
+    type OTP_TYPE
+    expired Boolean @default(false)
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @updatedAt @map(name: "updated_at")
+}
