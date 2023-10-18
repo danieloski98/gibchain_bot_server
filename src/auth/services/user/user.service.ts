@@ -6,14 +6,16 @@ import { BadRequestException } from '@nestjs/common';
 import { EmailServiceService } from 'src/email-service/email-service.service';
 import { randomInt } from 'crypto';
 import { VerifyCodeDTO } from 'src/auth/DTO/VerifyCodeDTO';
-import TelegramBot from 'node-telegram-bot-api';
 import { HttpService } from '@nestjs/axios';
+require('dotenv').config();
+const TelegramBot = require('node-telegram-bot-api');
 
 const token = process.env.TELEGRAM_API_KEY;
 
+
+
 @Injectable()
 export class UserService {
-    private bot = new TelegramBot(token as string, { polling: true });
   constructor(
     private databaseService: DatabaseService,
     private EmailService: EmailServiceService,
@@ -179,9 +181,11 @@ export class UserService {
       {
         price_amount: 20,
         price_currency: 'usd',
-        pay_currency: 'usdt',
+        pay_currency: 'usdttrc20',
         success_url: `${process.env.LOCAL_URL}/pay?id=${user.id}`,
         order_description: 'Payment for gibchain academy access',
+        is_fixed_rate: false,
+        is_fee_paid_by_user: false,
       },
       {
         headers: {
@@ -190,7 +194,10 @@ export class UserService {
       },
     );
 
-    this.bot.sendMessage(user.telegram_id, 
+    const bot = new TelegramBot(token as string, { polling: true });
+
+
+    bot.sendMessage(user.telegram_id, 
       "To pay for access to the gibchain academy follow this link \n" + '\n' +
       '<a href="' + request.data.invoice_url + '">link</a> ' + "\n" + '\n' +
       "if clicking link above doesn\'t work you can copy the link below and paste it in your browser" + "\n" + '\n' + 
