@@ -5,12 +5,15 @@ import { BadRequestException } from '@nestjs/common';
 import { EmailServiceService } from 'src/email-service/email-service.service';
 import { randomInt } from 'crypto';
 import { VerifyCodeDTO } from 'src/auth/DTO/VerifyCodeDTO';
+import TelegramBot from 'node-telegram-bot-api';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UserService {
   constructor(
     private databaseService: DatabaseService,
     private EmailService: EmailServiceService,
+    private httpService: HttpService,
   ) {}
 
   async createUserAccount(payload: CreateAccountDTO) {
@@ -163,6 +166,36 @@ export class UserService {
       where: { id: code.id },
       data: { expired: true },
     });
+
+    const token = process.env.TELEGRAM_API_KEY;
+    const bot = new TelegramBot(token as string, { polling: true });
+
+    const request = await this.httpService.axiosRef.post(
+      'https://api.nowpayments.io/v1/invoice',
+      {
+        price_amount: 20,
+        price_currency: 'usd',
+        pay_currency: 'usdt',
+        success_url: `${process.env.LOCAL_URL}/pay?id=${user.id}`,
+        order_description: 'Payment for gibchain academy access',
+      },
+      {
+        headers: {
+          'x-api-key': process.env.NOW_PAYMENT_API_KEY,
+        },
+      },
+    );
+
+    bot.sendMessage(user.telegram_id, 
+      "To pay for access to the gibchain academy follow this link \n" + '\n' +
+      '<a href="' + request.data.invoice_url + '">link</a> ' + "\n" + '\n' +
+      "if clicking link above doesn\'t work you can copy the link below and paste it in your browser" + "\n" + '\n' + 
+      request.data.invoice_url + "\n" + '\n' +
+      "Make sure to select the usdt trc20 wallet address" + "\n" +
+      "Thank you",
+       {
+      parse_mode: 'HTML'
+    })
 
     return {
       message: 'Email verified',
