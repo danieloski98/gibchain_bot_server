@@ -64,7 +64,7 @@ export class UserService {
         data: { expired: true },
       });
       clearTimeout(timeoout);
-    }, min);
+    }, 60 * 1000);
     // send email
     const emailRequest = await this.EmailService.sendConfirmationEmail({
       message: randomcode.toString(),
@@ -119,7 +119,7 @@ export class UserService {
         data: { expired: true },
       });
       clearTimeout(timeoout);
-    }, min);
+    }, 60 * 1000);
     // send email
     const emailRequest = await this.EmailService.sendConfirmationEmail({
       message: randomcode.toString(),
