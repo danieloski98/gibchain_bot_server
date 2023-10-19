@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { HttpService } from '@nestjs/axios';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
@@ -32,7 +33,7 @@ export class PaymentService {
           price_amount: 23.2,
           price_currency: 'usd',
           pay_currency: 'usdttrc20',
-          success_url: `${process.env.LOCAL_URL}/pay?id=${user.id}`,
+          success_url: `${process.env.LOCAL_URL}/pay?user_id=${user.id}`,
           order_description: 'Payment for gibchain academy access',
           is_fixed_rate: false,
           is_fee_paid_by_user: false,
@@ -81,16 +82,28 @@ export class PaymentService {
 
     const bot = new TelegramBot(token as string, { polling: true });
 
-    bot.sendMessage(user.telegram_id, 
-      "Click on  the link below to gain access to the gibchain academy \n" + '\n' +
-      '<a href="' + process.env.GROUP_LINK + '">Gibchain academy</a> ' + "\n" + '\n' +
-      "if clicking link above doesn\'t work you can copy the link below and paste it in your browser" + "\n" + '\n' + 
-      process.env.GROUP_LINK + "\n" + '\n' +
-      "Do  not share this link with anyone" + "\n" +
-      "Thank you",
+    bot.sendMessage(
+      user.telegram_id,
+      'Click on  the link below to gain access to the gibchain academy \n' +
+        '\n' +
+        '<a href="' +
+        process.env.GROUP_LINK +
+        '">Gibchain academy</a> ' +
+        '\n' +
+        '\n' +
+        "if clicking link above doesn't work you can copy the link below and paste it in your browser" +
+        '\n' +
+        '\n' +
+        process.env.GROUP_LINK +
+        '\n' +
+        '\n' +
+        'Do  not share this link with anyone' +
+        '\n' +
+        'Thank you',
       {
-          parse_mode: 'HTML',
-      });
+        parse_mode: 'HTML',
+      },
+    );
 
     return {
       message: 'Account approved',
