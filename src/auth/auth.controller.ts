@@ -3,11 +3,14 @@ import { UserService } from './services/user/user.service';
 import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateAccountDTO } from './DTO/CreateAccountDTO';
 import { VerifyCodeDTO } from './DTO/VerifyCodeDTO';
+import { CreateAdminAccountDTO } from './DTO/CreateAdminAccoountDTO';
+import { AdminService } from './services/admin/admin.service';
+import { LoginDTO } from './DTO/LoginDTO';
 
 @ApiTags('AUTHENTICATION')
 @Controller('auth')
 export class AuthController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private adminService: AdminService) {}
 
   @ApiBody({ type: CreateAccountDTO })
   @Post('user/create-account')
@@ -25,5 +28,17 @@ export class AuthController {
   @Post('user/verify-code')
   verifyCode(@Body() body: VerifyCodeDTO) {
     return this.userService.validateCode(body);
+  }
+
+  @ApiBody({ type: CreateAdminAccountDTO })
+  @Post('admin/create-account')
+  createAdminAccount(@Body() body: CreateAdminAccountDTO) {
+    return this.adminService.createAdminAccount(body);
+  }
+
+  @ApiBody({ type: LoginDTO })
+  @Post('admin/login')
+  login(@Body() body: LoginDTO) {
+    return this.adminService.login(body);
   }
 }

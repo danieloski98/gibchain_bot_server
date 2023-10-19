@@ -9,24 +9,51 @@ datasource db {
 }
 
 model User {
-    id                String      @id @default(cuid())
-    name              String?
-    telegram_username String
-    telegram_id       String
-    email             String      @unique
-    email_verified      Boolean @default(false)
-    phone             String
-    referral          String?
-    has_paid          Boolean     @default(false)
-    createdAt         DateTime    @default(now()) @map(name: "created_at")
-    updatedAt         DateTime    @updatedAt @map(name: "updated_at")
-    referrals         Referrals[]
+    id                  String               @id @default(cuid())
+    name                String?
+    telegram_username   String
+    telegram_id         String               
+    email               String               @unique
+    email_verified      Boolean              @default(false)
+    phone               String
+    referral            String?
+    has_paid            Boolean              @default(false)
+    createdAt           DateTime             @default(now()) @map(name: "created_at")
+    updatedAt           DateTime             @updatedAt @map(name: "updated_at")
+    referrals           Referrals[]
+    Widthdrawal_request Widthdrawal_request?
+}
+
+model Admin {
+    id                  String                @id @default(cuid())
+    email               String
+    password            String
+    fullName            String
+    phone               String
+    createdAt           DateTime              @default(now()) @map(name: "created_at")
+    updatedAt           DateTime              @updatedAt @map(name: "updated_at")
+    Widthdrawal_request Widthdrawal_request[]
+}
+
+model Widthdrawal_request {
+    id             String   @id @default(cuid())
+    user_id    String   @unique
+    amount         Float
+    wallet_address String
+    network        String
+    approved_by    String?
+    approved       Boolean  @default(false)
+    createdAt      DateTime @default(now()) @map(name: "created_at")
+    updatedAt      DateTime @updatedAt @map(name: "updated_at")
+
+    user  User  @relation(fields: [user_id], references: [id])
+    admin Admin? @relation(fields: [approved_by], references: [id])
 }
 
 model Referrals {
-    id      String  @id @default(cuid())
-    User    User?   @relation(fields: [telegram_id], references: [id])
-    telegram_id  String?
+    id          String  @id @default(cuid())
+    User        User?   @relation(fields: [telegram_id], references: [id])
+    telegram_id String?
 }
 
 enum OTP_TYPE {
@@ -35,11 +62,11 @@ enum OTP_TYPE {
 }
 
 model Code {
-    id String @id @default(cuid())
-    user_id String
-    code Int
-    type OTP_TYPE
-    expired Boolean @default(false)
+    id        String   @id @default(cuid())
+    user_id   String
+    code      Int
+    type      OTP_TYPE
+    expired   Boolean  @default(false)
     createdAt DateTime @default(now()) @map(name: "created_at")
     updatedAt DateTime @updatedAt @map(name: "updated_at")
 }
