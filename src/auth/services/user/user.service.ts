@@ -179,7 +179,7 @@ export class UserService {
     const request = await this.httpService.axiosRef.post(
       'https://api.nowpayments.io/v1/invoice',
       {
-        price_amount: 24,
+        price_amount: 23.2,
         price_currency: 'usd',
         pay_currency: 'usdttrc20',
         success_url: `${process.env.LOCAL_URL}/pay?id=${user.id}`,

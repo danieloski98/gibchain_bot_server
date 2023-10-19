@@ -71,4 +71,31 @@ export class UserService {
       },
     };
   }
+
+  public async getAllUSers() {
+    const users = await this.databaseService.user.findMany({
+      
+    });
+    return {
+      message: 'users',
+      data: users,
+      statusCode: 200,
+    }
+  }
+
+  public async getUserById(userId: string) {
+    const user = await this.databaseService.user.findFirst({
+      where: { id: userId },
+      include: {
+        referrals: true,
+        Widthdrawal_request: true,
+      }
+    });
+
+    return {
+      message: 'user',
+      data: user,
+      statusCode: 200,
+    }
+  }
 }
