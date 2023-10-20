@@ -84,6 +84,11 @@ export class PaymentService {
 
     bot.sendMessage(
       user.telegram_id,
+      'Your payment was successful, you can now proceed to join the group',
+    );
+
+    bot.sendMessage(
+      user.telegram_id,
       'Click on  the link below to gain access to the gibchain academy \n' +
         '\n' +
         '<a href="' +

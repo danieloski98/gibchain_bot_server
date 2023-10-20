@@ -1,4 +1,5 @@
-require('dotenv').config()
+/* eslint-disable @typescript-eslint/no-var-requires */
+require('dotenv').config();
 import { Injectable } from '@nestjs/common';
 import { CreateAccountDTO } from 'src/auth/DTO/CreateAccountDTO';
 import { DatabaseService } from 'src/database/database.service';
@@ -12,8 +13,6 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const token = process.env.TELEGRAM_API_KEY;
 
-
-
 @Injectable()
 export class UserService {
   constructor(
@@ -23,7 +22,6 @@ export class UserService {
   ) {}
 
   async createUserAccount(payload: CreateAccountDTO) {
-    
     const user = await this.databaseService.user.findFirst({
       where: {
         OR: [
@@ -66,8 +64,6 @@ export class UserService {
         type: 'VERIFICATION',
       },
     });
-    const now = new Date();
-    const min = now.setMinutes(now.getMinutes() + 5);
     const timeoout = setTimeout(async () => {
       await this.databaseService.code.update({
         where: { id: newCode.id },
@@ -121,8 +117,6 @@ export class UserService {
         type: 'VERIFICATION',
       },
     });
-    const now = new Date();
-    const min = now.setMinutes(now.getMinutes() + 5);
     const timeoout = setTimeout(async () => {
       await this.databaseService.code.update({
         where: { id: newCode.id },
@@ -174,8 +168,6 @@ export class UserService {
       data: { expired: true },
     });
 
-   
-
     const request = await this.httpService.axiosRef.post(
       'https://api.nowpayments.io/v1/invoice',
       {
@@ -196,17 +188,35 @@ export class UserService {
 
     const bot = new TelegramBot(token as string, { polling: true });
 
+    bot.sendMessage(
+      user.telegram_id,
+      `Your email added ${user.email} has been verified`,
+    );
 
-    bot.sendMessage(user.telegram_id, 
-      "To pay for access to the gibchain academy follow this link \n" + '\n' +
-      '<a href="' + request.data.invoice_url + '">link</a> ' + "\n" + '\n' +
-      "if clicking link above doesn\'t work you can copy the link below and paste it in your browser" + "\n" + '\n' + 
-      request.data.invoice_url + "\n" + '\n' +
-      "Make sure to select the usdt trc20 wallet address" + "\n" +
-      "Thank you",
-       {
-      parse_mode: 'HTML'
-    })
+    bot.sendMessage(
+      user.telegram_id,
+      'Your email has been verified You' +
+        '\n' +
+        'To pay for access to the gibchain academy follow this link \n' +
+        '\n' +
+        '<a href="' +
+        request.data.invoice_url +
+        '">link</a> ' +
+        '\n' +
+        '\n' +
+        "if clicking link above doesn't work you can copy the link below and paste it in your browser" +
+        '\n' +
+        '\n' +
+        request.data.invoice_url +
+        '\n' +
+        '\n' +
+        'Make sure to select the usdt trc20 wallet address' +
+        '\n' +
+        'Thank you',
+      {
+        parse_mode: 'HTML',
+      },
+    );
 
     return {
       message: 'Email verified',
