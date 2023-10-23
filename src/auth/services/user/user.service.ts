@@ -9,7 +9,8 @@ import { randomInt } from 'crypto';
 import { VerifyCodeDTO } from 'src/auth/DTO/VerifyCodeDTO';
 import { HttpService } from '@nestjs/axios';
 require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
+//const TelegramBot = require('node-telegram-bot-api');
+import { Telegraf } from 'telegraf';
 
 const token = process.env.TELEGRAM_API_KEY;
 
@@ -168,6 +169,13 @@ export class UserService {
       data: { expired: true },
     });
 
+    await this.databaseService.user.update({
+      where: { id: user.id },
+      data: {
+        email_verified: true,
+      },
+    });
+
     const request = await this.httpService.axiosRef.post(
       'https://api.nowpayments.io/v1/invoice',
       {
@@ -186,35 +194,37 @@ export class UserService {
       },
     );
 
-    const bot = new TelegramBot(token as string, { polling: true });
+    const bot = new Telegraf(token as string);
 
-    bot.sendMessage(
-      user.telegram_id,
-      `Your email added ${user.email} has been verified`,
-    );
+    console.log(request.data);
 
-    bot.sendMessage(
+    await this.databaseService.payment.create({
+      data: {
+        telegram_id: user.telegram_id,
+        payment_id: request.data.id,
+        status: 'waiting',
+      },
+    });
+
+    bot.telegram.sendMessage(
       user.telegram_id,
-      'Your email has been verified You' +
+      'Your email' +
+        ' ' +
+        user.email +
+        'has been verified' +
         '\n' +
-        'To pay for access to the gibchain academy follow this link \n' +
-        '\n' +
-        '<a href="' +
-        request.data.invoice_url +
-        '">link</a> ' +
-        '\n' +
-        '\n' +
-        "if clicking link above doesn't work you can copy the link below and paste it in your browser" +
-        '\n' +
-        '\n' +
-        request.data.invoice_url +
-        '\n' +
-        '\n' +
-        'Make sure to select the usdt trc20 wallet address' +
-        '\n' +
-        'Thank you',
+        'To pay for access to the gibchain academy follow this link ',
       {
-        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '💰 Make Payment',
+                url: request.data.invoice_url,
+              },
+            ],
+          ],
+        },
       },
     );
 

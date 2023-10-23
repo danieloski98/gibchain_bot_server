@@ -12,6 +12,10 @@ export class UserService {
       where: {
         telegram_id,
       },
+      include: {
+        referrals: true,
+        Widthdrawal_request: true,
+      },
     });
 
     if (user === null) {
@@ -73,14 +77,12 @@ export class UserService {
   }
 
   public async getAllUSers() {
-    const users = await this.databaseService.user.findMany({
-      
-    });
+    const users = await this.databaseService.user.findMany({});
     return {
       message: 'users',
       data: users,
       statusCode: 200,
-    }
+    };
   }
 
   public async getUserById(userId: string) {
@@ -89,13 +91,13 @@ export class UserService {
       include: {
         referrals: true,
         Widthdrawal_request: true,
-      }
+      },
     });
 
     return {
       message: 'user',
       data: user,
       statusCode: 200,
-    }
+    };
   }
 }

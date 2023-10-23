@@ -21,7 +21,7 @@ model User {
     createdAt           DateTime             @default(now()) @map(name: "created_at")
     updatedAt           DateTime             @updatedAt @map(name: "updated_at")
     referrals           Referrals[]
-    Widthdrawal_request Widthdrawal_request?
+    Widthdrawal_request Widthdrawal_request[]
 }
 
 model Admin {
@@ -69,4 +69,25 @@ model Code {
     expired   Boolean  @default(false)
     createdAt DateTime @default(now()) @map(name: "created_at")
     updatedAt DateTime @updatedAt @map(name: "updated_at")
+}
+
+enum PAYMENT_STATUS {
+    waiting
+    confirming
+    confirmed
+    sending
+    partially_paid
+    finished
+    failed
+    refunded
+    expired
+}
+
+model Payment {
+    id        String   @id @default(cuid())
+    telegram_id String
+    payment_id String
+    status    PAYMENT_STATUS @default(waiting)
+    createdAt      DateTime @default(now()) @map(name: "created_at")
+    updatedAt      DateTime @updatedAt @map(name: "updated_at")
 }

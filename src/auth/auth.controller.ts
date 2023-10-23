@@ -10,7 +10,10 @@ import { LoginDTO } from './DTO/LoginDTO';
 @ApiTags('AUTHENTICATION')
 @Controller('auth')
 export class AuthController {
-  constructor(private userService: UserService, private adminService: AdminService) {}
+  constructor(
+    private userService: UserService,
+    private adminService: AdminService,
+  ) {}
 
   @ApiBody({ type: CreateAccountDTO })
   @Post('user/create-account')

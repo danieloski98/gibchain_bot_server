@@ -3,8 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 require('dotenv').config();
-const TelegramBot = require('node-telegram-bot-api');
-
+import { Telegraf } from 'telegraf';
 const token = process.env.TELEGRAM_API_KEY;
 
 @Injectable()
@@ -34,6 +33,7 @@ export class PaymentService {
           price_currency: 'usd',
           pay_currency: 'usdttrc20',
           success_url: `${process.env.LOCAL_URL}/pay?user_id=${user.id}`,
+          cancel_url: `${process.env.LOCAL_URL}`,
           order_description: 'Payment for gibchain academy access',
           is_fixed_rate: false,
           is_fee_paid_by_user: false,
@@ -80,33 +80,24 @@ export class PaymentService {
       data: { has_paid: true },
     });
 
-    const bot = new TelegramBot(token as string, { polling: true });
+    const bot = new Telegraf(token as string);
 
-    bot.sendMessage(
+    bot.telegram.sendMessage(
       user.telegram_id,
-      'Your payment was successful, you can now proceed to join the group',
-    );
-
-    bot.sendMessage(
-      user.telegram_id,
-      'Click on  the link below to gain access to the gibchain academy \n' +
+      'Your payment was successful, you can now proceed to join the group' +
         '\n' +
-        '<a href="' +
-        process.env.GROUP_LINK +
-        '">Gibchain academy</a> ' +
-        '\n' +
-        '\n' +
-        "if clicking link above doesn't work you can copy the link below and paste it in your browser" +
-        '\n' +
-        '\n' +
-        process.env.GROUP_LINK +
-        '\n' +
-        '\n' +
-        'Do  not share this link with anyone' +
-        '\n' +
-        'Thank you',
+        'Click on  the link below to gain access to gibchain academy \n',
       {
-        parse_mode: 'HTML',
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: '👥 Join Group',
+                url: process.env.GROUP_LINK,
+              },
+            ],
+          ],
+        },
       },
     );
 
@@ -114,5 +105,28 @@ export class PaymentService {
       message: 'Account approved',
       statusCode: 200,
     };
+  }
+
+  public async widthdrawa(telegram_id: string) {
+    const user = await this.databaseService.user.findFirst({
+      where: {
+        telegram_id,
+      },
+      include: {
+        referrals: true,
+      },
+    });
+
+    if (user === null) {
+      throw new BadRequestException('Userr not foound');
+    }
+
+    // await this.databaseService.widthdrawal_request.create({
+    //   data: {
+    //     network: 'trc20',
+
+    //     wallet_address: '',
+    //   }
+    // });
   }
 }
