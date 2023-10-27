@@ -40,6 +40,36 @@ export class WebhookService {
     }
   }
 
+  private async chargePending(body: WebhookDTO) {
+    const user = await this.databaseService.user.findFirst({
+      where: {
+        email: body.event.data.metadata.email,
+      },
+    });
+
+    if (user === null) {
+      console.log('----USER NOT FOUND---');
+      return;
+    }
+
+    // CHECK FOR PAYMENT
+    const payment = await this.databaseService.payment.findFirst({
+      where: {
+        payment_id: body.event.id,
+      },
+    });
+
+    if (payment === null) {
+      await this.databaseService.payment.create({
+        data: {
+          payment_id: body.event.id,
+          telegram_id: user.telegram_id,
+          status: 'pending',
+        },
+      });
+    }
+  }
+
   private async chargeConfirmed(body: WebhookDTO) {
     const user = await this.databaseService.user.findFirst({
       where: {
@@ -109,6 +139,7 @@ export class WebhookService {
   }
 
   async handleWebhookEvent(body: WebhookDTO) {
+    console.log(body);
     switch (body.event.type) {
       case 'charge:created': {
         this.chargeCreated(body);
@@ -121,6 +152,13 @@ export class WebhookService {
       case 'charge:failed': {
         this.chargeFailed(body);
         break;
+      }
+      case 'charge:pending': {
+        this.chargePending(body);
+        break;
+      }
+      default: {
+        console.log(body.event.data.metadata);
       }
     }
     return {
