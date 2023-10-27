@@ -9,19 +9,20 @@ datasource db {
 }
 
 model User {
-    id                  String               @id @default(cuid())
+    id                  String                @id @default(cuid())
     name                String?
     telegram_username   String
-    telegram_id         String               
-    email               String               @unique
-    email_verified      Boolean              @default(false)
+    telegram_id         String
+    email               String                @unique
+    email_verified      Boolean               @default(false)
     phone               String
     referral            String?
-    has_paid            Boolean              @default(false)
-    createdAt           DateTime             @default(now()) @map(name: "created_at")
-    updatedAt           DateTime             @updatedAt @map(name: "updated_at")
+    has_paid            Boolean               @default(false)
+    createdAt           DateTime              @default(now()) @map(name: "created_at")
+    updatedAt           DateTime              @updatedAt @map(name: "updated_at")
     referrals           Referrals[]
     Widthdrawal_request Widthdrawal_request[]
+    Payment             Payment[]
 }
 
 model Admin {
@@ -37,7 +38,7 @@ model Admin {
 
 model Widthdrawal_request {
     id             String   @id @default(cuid())
-    user_id    String   @unique
+    user_id        String   @unique
     amount         Float
     wallet_address String
     network        String
@@ -46,7 +47,7 @@ model Widthdrawal_request {
     createdAt      DateTime @default(now()) @map(name: "created_at")
     updatedAt      DateTime @updatedAt @map(name: "updated_at")
 
-    user  User  @relation(fields: [user_id], references: [id])
+    user  User   @relation(fields: [user_id], references: [id])
     admin Admin? @relation(fields: [approved_by], references: [id])
 }
 
@@ -72,22 +73,21 @@ model Code {
 }
 
 enum PAYMENT_STATUS {
-    waiting
-    confirming
+    created
     confirmed
-    sending
-    partially_paid
-    finished
     failed
-    refunded
-    expired
+    delayed
+    pending
+    resolved
 }
 
 model Payment {
-    id        String   @id @default(cuid())
+    id          String         @id @default(cuid())
     telegram_id String
-    payment_id String
-    status    PAYMENT_STATUS @default(waiting)
-    createdAt      DateTime @default(now()) @map(name: "created_at")
-    updatedAt      DateTime @updatedAt @map(name: "updated_at")
+    payment_id  String
+    status      PAYMENT_STATUS @default(created)
+    createdAt   DateTime       @default(now()) @map(name: "created_at")
+    updatedAt   DateTime       @updatedAt @map(name: "updated_at")
+
+    user User @relation(fields: [telegram_id], references: [id])
 }

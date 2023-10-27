@@ -35,4 +35,60 @@ export class EmailServiceService {
       };
     }
   }
+
+  public async sendPaymentConfirmationEmail({
+    email,
+  }: {
+    message: string;
+    email: string;
+  }) {
+    try {
+      const data: any = await this.resend.emails.send({
+        from: 'support@support.gibchainacademy.com',
+        to: [email],
+        subject: 'Payment Successful',
+        html: `Your payment was successful here is the link to the group ${process.env.GROUP_LINK}`,
+      });
+
+      console.log(data);
+      return {
+        message: data?.message || 'Verification code sent to your email',
+        statusCode: data.statusCode || 200,
+        data,
+      };
+    } catch (error: any) {
+      return {
+        message: error.message,
+        statusCode: 400,
+      };
+    }
+  }
+
+  public async sendPaymentFaliedEmail({
+    email,
+  }: {
+    message: string;
+    email: string;
+  }) {
+    try {
+      const data: any = await this.resend.emails.send({
+        from: 'support@support.gibchainacademy.com',
+        to: [email],
+        subject: 'Payment Failed',
+        html: `Your payment was not successful.`,
+      });
+
+      console.log(data);
+      return {
+        message: data?.message || 'Verification code sent to your email',
+        statusCode: data.statusCode || 200,
+        data,
+      };
+    } catch (error: any) {
+      return {
+        message: error.message,
+        statusCode: 400,
+      };
+    }
+  }
 }

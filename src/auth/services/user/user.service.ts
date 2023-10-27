@@ -176,35 +176,7 @@ export class UserService {
       },
     });
 
-    const request = await this.httpService.axiosRef.post(
-      'https://api.nowpayments.io/v1/invoice',
-      {
-        price_amount: 23.2,
-        price_currency: 'usd',
-        pay_currency: 'usdttrc20',
-        success_url: `${process.env.LOCAL_URL}/pay?id=${user.id}`,
-        order_description: 'Payment for gibchain academy access',
-        is_fixed_rate: false,
-        is_fee_paid_by_user: false,
-      },
-      {
-        headers: {
-          'x-api-key': process.env.NOW_PAYMENT_API_KEY,
-        },
-      },
-    );
-
     const bot = new Telegraf(token as string);
-
-    console.log(request.data);
-
-    await this.databaseService.payment.create({
-      data: {
-        telegram_id: user.telegram_id,
-        payment_id: request.data.id,
-        status: 'waiting',
-      },
-    });
 
     bot.telegram.sendMessage(
       user.telegram_id,
@@ -219,8 +191,8 @@ export class UserService {
           inline_keyboard: [
             [
               {
-                text: '💰 Make Payment',
-                url: request.data.invoice_url,
+                text: '💰 ACCESS CLASS',
+                url: 'https://commerce.coinbase.com/checkout/d91a310f-29d7-497a-b4eb-b420d47ea81b',
               },
             ],
           ],
