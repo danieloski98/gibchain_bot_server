@@ -2,6 +2,9 @@
 require('dotenv').config();
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { Telegraf } from 'telegraf';
+
+const token = process.env.TELEGRAM_API_KEY;
 
 @Injectable()
 export class UserService {
@@ -99,5 +102,64 @@ export class UserService {
       data: user,
       statusCode: 200,
     };
+  }
+
+  public async getUnverifiedUsers() {
+    const users = await this.databaseService.user.findMany({
+      where: {
+        has_paid: false,
+      },
+    });
+
+    return {
+      message: 'Users',
+      data: users,
+    };
+  }
+
+  public async markAccountasHasPaid(user_id: string) {
+    const user = await this.databaseService.user.findFirst({
+      where: {
+        id: user_id,
+      },
+    });
+
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+
+    await this.databaseService.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        has_paid: true,
+      },
+    });
+
+    const bot = new Telegraf(token as string);
+
+    bot.telegram.sendMessage(
+      user.telegram_id,
+      'Click on  the link below to gain access to the gibchain academy \n' +
+        '\n' +
+        '<a href="' +
+        process.env.GROUP_LINK +
+        '">Gibchain academy</a> ' +
+        '\n' +
+        '\n' +
+        "if clicking link above doesn't work you can copy the link below and paste it in your browser" +
+        '\n' +
+        '\n' +
+        process.env.GROUP_LINK +
+        '\n' +
+        '\n' +
+        'Do  not share this link with anyone' +
+        '\n' +
+        'Thank you',
+      {
+        parse_mode: 'HTML',
+      },
+    );
   }
 }
