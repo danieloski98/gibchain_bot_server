@@ -198,7 +198,7 @@ export class UserService {
           { source: './code.png' },
           {
             caption:
-              'To pay for access to the class scan the code above and send *USDT TRC20*' +
+              'To pay for access to the class scan the code above and send *22 USDT TRC20*' +
               '\n' +
               '\n' +
               "If the code doesn't work for you copy the address below" +

@@ -26,9 +26,14 @@ export class UserController {
   }
 
   @ApiParam({ name: 'telegram_id' })
-  @Get('get/unpaid-users')
+  @Get('unpaid-users')
   getUnpaidUsers() {
     return this.userService.getUnverifiedUsers();
+  }
+
+  @Get('all')
+  getUsers() {
+    return this.userService.getAllUSers();
   }
 
   @ApiParam({ name: 'user_id' })
