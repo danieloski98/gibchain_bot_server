@@ -11,7 +11,7 @@ import { HttpService } from '@nestjs/axios';
 require('dotenv').config();
 //const TelegramBot = require('node-telegram-bot-api');
 import { Telegraf } from 'telegraf';
-import QRCode from 'qrcode';
+import { toFile } from 'qrcode';
 
 const token = process.env.TELEGRAM_API_KEY;
 
@@ -186,44 +186,41 @@ export class UserService {
       margin: 1, // Margin around the QR code (default is 4 for png, 1 for others)
     };
 
+    console.log(toFile);
+
     // generate qrcode
-    QRCode.toFile(
-      './code.png',
-      process.env.WALLET as any,
-      options as any,
-      (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          bot.telegram.sendPhoto(
-            user.telegram_id,
-            { source: './code.png' },
-            {
-              caption:
-                'To pay for access to the class scan the code above and send *USDT TRC20*' +
-                '\n' +
-                '\n' +
-                "If the code doesn't work for you copy the address below" +
-                '\n' +
-                '\n' +
-                'ADDRESS ' +
-                '\n' +
-                '\n' +
-                process.env.WALLET +
-                '\n' +
-                '\n' +
-                'NETWORK TRC20 ' +
-                '\n' +
-                '\n' +
-                'After payment, send your proof of payment to this whatsapp number' +
-                '\n' +
-                `[whatsapp link](${process.env.WHATSAPP_GROUP})`,
-              parse_mode: 'MarkdownV2',
-            },
-          );
-        }
-      },
-    );
+    toFile('./code.png', process.env.WALLET as any, options as any, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        bot.telegram.sendPhoto(
+          user.telegram_id,
+          { source: './code.png' },
+          {
+            caption:
+              'To pay for access to the class scan the code above and send *USDT TRC20*' +
+              '\n' +
+              '\n' +
+              "If the code doesn't work for you copy the address below" +
+              '\n' +
+              '\n' +
+              'ADDRESS ' +
+              '\n' +
+              '\n' +
+              process.env.WALLET +
+              '\n' +
+              '\n' +
+              'NETWORK TRC20 ' +
+              '\n' +
+              '\n' +
+              'After payment, send your proof of payment to this whatsapp number' +
+              '\n' +
+              `[whatsapp link](${process.env.WHATSAPP_GROUP})`,
+            parse_mode: 'MarkdownV2',
+          },
+        );
+      }
+    });
 
     // bot.telegram.sendMessage(
     //   user.telegram_id,
