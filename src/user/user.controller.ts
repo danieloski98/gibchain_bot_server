@@ -36,6 +36,12 @@ export class UserController {
     return this.userService.getAllUSers();
   }
 
+  @ApiParam({ name: 'id' })
+  @Get(':id')
+  getUser(@Param('id') id: string) {
+    return this.userService.getUserById(id);
+  }
+
   @ApiParam({ name: 'user_id' })
   @Put('approve/:user_id')
   approveAccount(@Param('user_id') user_id: string) {
