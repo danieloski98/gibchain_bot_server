@@ -21,6 +21,7 @@ model User {
     createdAt           DateTime              @default(now()) @map(name: "created_at")
     updatedAt           DateTime              @updatedAt @map(name: "updated_at")
     referrals           Referrals[]
+    totalWithdrawals    Float                  @default(0.0)
     Widthdrawal_request Widthdrawal_request[]
     Payment             Payment[]
 }
