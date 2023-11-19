@@ -91,15 +91,29 @@ export class UserService {
   public async getUserById(userId: string) {
     const user = await this.databaseService.user.findFirst({
       where: { id: userId },
-      include: {
-        referrals: true,
-        Widthdrawal_request: true,
+    });
+
+    const referrals = await this.databaseService.user.count({
+      where: {
+        referral: user.telegram_id,
+        has_paid: true,
       },
     });
 
+    const withdrawal_request =
+      await this.databaseService.widthdrawal_request.count({
+        where: {
+          user_id: user.id,
+        },
+      });
+
     return {
       message: 'user',
-      data: user,
+      data: {
+        ...user,
+        referrals,
+        withdrawal_request,
+      },
       statusCode: 200,
     };
   }

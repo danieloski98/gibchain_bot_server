@@ -40,9 +40,10 @@ export class WithdrawalService {
     }
 
     // get all withdrawals that have been approved,
-    const referrals = await this.databaseservice.referrals.findMany({
+    const referrals = await this.databaseservice.user.findMany({
       where: {
-        telegram_id,
+        referral: user.telegram_id,
+        has_paid: true,
       },
     });
 
@@ -92,9 +93,10 @@ export class WithdrawalService {
       },
     );
 
-    const referrals = await this.databaseservice.referrals.findMany({
+    const referrals = await this.databaseservice.user.findMany({
       where: {
-        telegram_id: payload.telegram_id,
+        referral: user.referral,
+        has_paid: true,
       },
     });
 

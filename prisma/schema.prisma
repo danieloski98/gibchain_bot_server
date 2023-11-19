@@ -56,6 +56,7 @@ model Referrals {
     id          String  @id @default(cuid())
     User        User?   @relation(fields: [telegram_id], references: [id])
     telegram_id String?
+    referredUserId String
 }
 
 enum OTP_TYPE {

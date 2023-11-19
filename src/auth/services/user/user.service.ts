@@ -39,7 +39,7 @@ export class UserService {
     }
 
     // create user account
-    if (payload.referral === payload.telegram_id) {
+    if (payload.referral && payload.referral === payload.telegram_id) {
       delete payload.referral;
     }
 
@@ -53,6 +53,7 @@ export class UserService {
       await this.databaseService.referrals.create({
         data: {
           telegram_id: payload.referral,
+          referredUserId: newUser.id,
         },
       });
     }
