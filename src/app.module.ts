@@ -11,7 +11,14 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { WithdrawalModule } from './withdrawal/withdrawal.module';
 
 @Module({
-  imports: [AuthModule, PaymentModule, UserModule, WebhookModule, AnalyticsModule, WithdrawalModule],
+  imports: [
+    AuthModule,
+    PaymentModule,
+    UserModule,
+    WebhookModule,
+    AnalyticsModule,
+    WithdrawalModule,
+  ],
   controllers: [AppController],
   providers: [AppService, DatabaseService, EmailServiceService],
 })

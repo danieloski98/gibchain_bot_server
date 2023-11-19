@@ -65,6 +65,7 @@ export class WithdrawalService {
   }
 
   public async createWithdrawal(payload: WithdrawalDTO) {
+    console.log(payload);
     const user = await this.databaseservice.user.findFirst({
       where: {
         telegram_id: payload.telegram_id,
@@ -95,14 +96,21 @@ export class WithdrawalService {
 
     const referrals = await this.databaseservice.user.findMany({
       where: {
-        referral: user.referral,
+        referral: user.telegram_id,
         has_paid: true,
       },
     });
 
-    const totalWithdrawals = withdrawals.reduce((total, withdrawal) => {
-      return total + withdrawal.amount;
-    }, 0);
+    const totalWithdrawals =
+      withdrawals.length < 1
+        ? 0
+        : withdrawals.reduce((total, withdrawal) => {
+            return total + withdrawal.amount;
+          }, 0);
+
+    if (referrals.length < 1) {
+      throw new BadRequestException('You do not have any referral');
+    }
 
     // calculate
     const totalReferrals = referrals.length * 2;
