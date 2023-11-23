@@ -88,6 +88,19 @@ export class UserService {
     };
   }
 
+  public async getApprovedUSers() {
+    const users = await this.databaseService.user.findMany({
+      where: {
+        has_paid: true,
+      },
+    });
+    return {
+      message: 'users',
+      data: users,
+      statusCode: 200,
+    };
+  }
+
   public async getUserById(userId: string) {
     const user = await this.databaseService.user.findFirst({
       where: { id: userId },

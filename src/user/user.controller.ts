@@ -25,10 +25,14 @@ export class UserController {
     return this.userService.getGroupLink(telegram_id);
   }
 
-  @ApiParam({ name: 'telegram_id' })
   @Get('unpaid-users')
   getUnpaidUsers() {
     return this.userService.getUnverifiedUsers();
+  }
+
+  @Get('approved-users')
+  getApprovedUsers() {
+    return this.userService.getApprovedUSers();
   }
 
   @Get('all')
