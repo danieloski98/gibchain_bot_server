@@ -93,3 +93,8 @@ model Payment {
 
     user User @relation(fields: [telegram_id], references: [id])
 }
+
+model config {
+    id String @id @default(cuid())
+    fee Float
+}

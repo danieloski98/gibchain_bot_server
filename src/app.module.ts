@@ -9,6 +9,7 @@ import { EmailServiceService } from './email-service/email-service.service';
 import { WebhookModule } from './webhook/webhook.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { WithdrawalModule } from './withdrawal/withdrawal.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { WithdrawalModule } from './withdrawal/withdrawal.module';
     WebhookModule,
     AnalyticsModule,
     WithdrawalModule,
+    ConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseService, EmailServiceService],
