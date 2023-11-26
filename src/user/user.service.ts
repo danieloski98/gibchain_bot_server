@@ -44,7 +44,7 @@ export class UserService {
 
     const referrals = await this.databaseService.referrals.findMany({
       where: {
-        telegram_id,
+        referral_id: telegram_id,
       },
     });
 

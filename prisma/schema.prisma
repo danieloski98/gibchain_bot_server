@@ -12,7 +12,7 @@ model User {
     id                  String                @id @default(cuid())
     name                String?
     telegram_username   String
-    telegram_id         String
+    telegram_id         String                @unique
     email               String                @unique
     email_verified      Boolean               @default(false)
     phone               String
@@ -21,7 +21,7 @@ model User {
     createdAt           DateTime              @default(now()) @map(name: "created_at")
     updatedAt           DateTime              @updatedAt @map(name: "updated_at")
     referrals           Referrals[]
-    totalWithdrawals    Float                  @default(0.0)
+    totalWithdrawals    Float                 @default(0.0)
     Widthdrawal_request Widthdrawal_request[]
     Payment             Payment[]
 }
@@ -53,9 +53,9 @@ model Widthdrawal_request {
 }
 
 model Referrals {
-    id          String  @id @default(cuid())
-    User        User?   @relation(fields: [telegram_id], references: [id])
-    telegram_id String?
+    id             String  @id @default(cuid())
+    User           User?   @relation(fields: [referral_id], references: [telegram_id])
+    referral_id    String?
     referredUserId String
 }
 
@@ -95,9 +95,9 @@ model Payment {
 }
 
 model config {
-    id String @id @default(cuid())
-    fee Float
+    id             String  @id @default(cuid())
+    fee            Float
     wallet_address String?
-    network String?
-    currency String?
+    network        String?
+    currency       String?
 }

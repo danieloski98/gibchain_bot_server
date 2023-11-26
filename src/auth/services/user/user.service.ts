@@ -50,9 +50,10 @@ export class UserService {
     });
 
     if (payload.referral) {
+      console.log(payload);
       await this.databaseService.referrals.create({
         data: {
-          telegram_id: payload.referral,
+          referral_id: payload.referral,
           referredUserId: newUser.id,
         },
       });
@@ -188,40 +189,47 @@ export class UserService {
     };
 
     console.log(toFile);
+    const config = await this.databaseService.config.findMany();
+    const details = config[0];
 
     // generate qrcode
-    toFile('./code.png', process.env.WALLET as any, options as any, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        bot.telegram.sendPhoto(
-          user.telegram_id,
-          { source: './code.png' },
-          {
-            caption:
-              'To pay for access to the class scan the code above and send *22 USDT TRC20*' +
-              '\n' +
-              '\n' +
-              "If the code doesn't work for you copy the address below" +
-              '\n' +
-              '\n' +
-              'ADDRESS ' +
-              '\n' +
-              '\n' +
-              process.env.WALLET +
-              '\n' +
-              '\n' +
-              'NETWORK TRC20 ' +
-              '\n' +
-              '\n' +
-              'After payment, send your proof of payment to this whatsapp number' +
-              '\n' +
-              `[whatsapp link](${process.env.WHATSAPP_GROUP})`,
-            parse_mode: 'MarkdownV2',
-          },
-        );
-      }
-    });
+    toFile(
+      './code.png',
+      details.wallet_address as any,
+      options as any,
+      (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          bot.telegram.sendPhoto(
+            user.telegram_id,
+            { source: './code.png' },
+            {
+              caption:
+                `To pay for access to the class scan the code above and send *${details.fee} ${details.currency} ${details.network}*` +
+                '\n' +
+                '\n' +
+                "If the code doesn't work for you copy the address below" +
+                '\n' +
+                '\n' +
+                'ADDRESS ' +
+                '\n' +
+                '\n' +
+                details.wallet_address +
+                '\n' +
+                '\n' +
+                `NETWORK ${details.network} ` +
+                '\n' +
+                '\n' +
+                'After payment, send your proof of payment to this whatsapp number' +
+                '\n' +
+                `[whatsapp link](${process.env.WHATSAPP_GROUP})`,
+              parse_mode: 'MarkdownV2',
+            },
+          );
+        }
+      },
+    );
 
     // bot.telegram.sendMessage(
     //   user.telegram_id,
