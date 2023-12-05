@@ -24,6 +24,7 @@ export class UserService {
   ) {}
 
   async createUserAccount(payload: CreateAccountDTO) {
+    console.log(payload);
     const user = await this.databaseService.user.findFirst({
       where: {
         OR: [
@@ -35,7 +36,9 @@ export class UserService {
     });
 
     if (user !== null) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException(
+        'Account already existt with either email or phone number',
+      );
     }
 
     // create user account
