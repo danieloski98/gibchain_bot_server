@@ -21,6 +21,49 @@ export class UserService {
       },
     });
 
+    // stats
+    const totalMoneyEarned = await this.databaseService.user.findMany({
+      where: {
+        AND: {
+          referral: user.telegram_id,
+          has_paid: true,
+        },
+      },
+    });
+
+    const withdrawals = await this.databaseService.widthdrawal_request.findMany(
+      {
+        where: {
+          AND: {
+            approved: true,
+            user_id: user.id,
+          },
+        },
+      },
+    );
+
+    const referrals = await this.databaseService.user.findMany({
+      where: {
+        AND: {
+          referral: user.telegram_id,
+          has_paid: true,
+        },
+      },
+    });
+
+    const totalWithdrawals =
+      withdrawals.length < 1
+        ? 0
+        : withdrawals.reduce((total, withdrawal) => {
+            return total + withdrawal.amount;
+          }, 0);
+
+    // calculate
+    const totalReferrals = referrals.length * 2;
+
+    user['totalEarnings'] = totalMoneyEarned.length * 2;
+    user['withdrawableAmount'] = totalReferrals - totalWithdrawals;
+
     if (user === null) {
       throw new BadRequestException('User not found');
     }
@@ -164,6 +207,8 @@ export class UserService {
       },
     });
 
+    const config = await this.databaseService.config.findMany();
+
     const bot = new Telegraf(token as string);
 
     bot.telegram.sendMessage(
@@ -171,14 +216,14 @@ export class UserService {
       'Click on  the link below to gain access to the gibchain academy \n' +
         '\n' +
         '<a href="' +
-        process.env.GROUP_LINK +
+        config[0].group_link +
         '">Gibchain academy</a> ' +
         '\n' +
         '\n' +
         "if clicking link above doesn't work you can copy the link below and paste it in your browser" +
         '\n' +
         '\n' +
-        process.env.GROUP_LINK +
+        config[0].group_link +
         '\n' +
         '\n' +
         'Do  not share this link with anyone' +

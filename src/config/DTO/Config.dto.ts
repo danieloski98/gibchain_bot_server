@@ -17,4 +17,8 @@ export class ConfigDTO {
   @ApiProperty()
   @IsString()
   currency: string;
+
+  @ApiProperty()
+  @IsString()
+  group_link: string;
 }

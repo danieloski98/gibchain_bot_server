@@ -100,4 +100,6 @@ model config {
     wallet_address String?
     network        String?
     currency       String?
+    group_link     String?
+    updatedAt      DateTime? @map(name: "updated_at") @updatedAt @default(now())
 }

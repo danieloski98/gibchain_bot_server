@@ -80,6 +80,8 @@ export class PaymentService {
       data: { has_paid: true },
     });
 
+    const config = await this.databaseService.config.findMany();
+
     const bot = new Telegraf(token as string);
 
     bot.telegram.sendMessage(
@@ -93,7 +95,7 @@ export class PaymentService {
             [
               {
                 text: '👥 Join Group',
-                url: process.env.GROUP_LINK,
+                url: config[0].group_link,
               },
             ],
           ],
