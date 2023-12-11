@@ -123,7 +123,11 @@ export class UserService {
   }
 
   public async getAllUSers() {
-    const users = await this.databaseService.user.findMany({});
+    const users = await this.databaseService.user.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
     return {
       message: 'users',
       data: users,
@@ -135,6 +139,9 @@ export class UserService {
     const users = await this.databaseService.user.findMany({
       where: {
         has_paid: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
     return {
@@ -178,6 +185,9 @@ export class UserService {
     const users = await this.databaseService.user.findMany({
       where: {
         has_paid: false,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
